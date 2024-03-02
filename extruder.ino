@@ -28,10 +28,8 @@ void step(int direction);
 
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
-  // speed = 20 + 100 * (analogRead(speedPin) / 1023.0);
+  speed = 20 + 100 * (analogRead(speedPin) / 1023.0);
   duration = 5 + 115 * (analogRead(durationPin) / 1023.0);
-  Serial.print(" D: ");
-  Serial.println(duration);
 
   if (digitalRead(forwardPin) && !isRotating) rotate_for_duration(FORWARD, speed, duration);
   if (digitalRead(reversePin) && !isRotating) rotate_for_duration(REVERSE, 120, 10);
