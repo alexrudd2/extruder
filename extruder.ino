@@ -8,45 +8,45 @@ const int forwardPin = 2;
 const int reversePin = 1; // fixme
 const int FORWARD = LOW;
 const int REVERSE = HIGH;
+const int MICROSTEPS = 16;
 
 void setup() {
   pinMode(stopPin, INPUT);
-  pinMode(stepPin, OUTPUT); 
+  pinMode(stepPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
   pinMode(forwardPin, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 };
-void step(int direction, int speed);
+void rotate_for_duration(int direction, int speed, int duration);
+void step(int direction);
 
 void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
 
-  // // clockwise
-  // digitalWrite(dirPin, HIGH);
-  // // Makes 200 * 16 pulses for making one full cycle rotation at 1/16 step
-  // for(int x = 0; x < 3200; x++) {
-  //   step(FORWARD, 30);
-  // }
-  // delay(1000); // One second delay
-  // digitalWrite(LED_BUILTIN, LOW);
-  
-  // //counter-clockwise
-  // // Makes 200 * 16 pulses for making two full cycle rotation at 1/16 step
-  // for(int x = 0; x < 3200; x++) {
-  //   step(REVERSE, 30);
-  // }
-  // delay(1000);
-  if (digitalRead(stopPin)) {
-    if (digitalRead(forwardPin)) step(FORWARD, 30);
-  } 
+  if (digitalRead(forwardPin)) rotate_for_duration(FORWARD, 30, 5);
 }
 
-void step(int direction, int speed) {
+void rotate_for_duration(int direction, int speed, int duration) {
+  // speed in RPM
+  if (speed < 20) speed = 20;
+  if (speed > 60) speed = 60;
+  // duration in sec
+  if (duration < 0) return;
+  if (duration > 60) duration = 60;
+
+  unsigned long startTime = millis(); // Record the start time
+  while (millis() - startTime < duration * 1000) {
+    if (!(digitalRead(stopPin))) return;
+    step(direction);
+    // 200 * 16 steps per revolution
+    delayMicroseconds(60 * 1000 * 1000 / speed / (200 * 16));
+  }
+}
+
+void step(int direction) {
+  if (!(digitalRead(stopPin))) return;
   digitalWrite(dirPin, direction);
-  // 30 RPM = 625us per 1/16  step
   digitalWrite(stepPin, HIGH);
-  delayMicroseconds(125);
   digitalWrite(stepPin, LOW);
-  delayMicroseconds(500);
 }
 // thanks to Dejan Nedelkovski, www.HowToMechatronics.com
