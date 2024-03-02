@@ -5,7 +5,7 @@ const int stepPin = 3;
 const int dirPin = 4; 
 const int stopPin = 5;
 const int forwardPin = 2;
-const int reversePin = 1; // fixme
+const int reversePin = 1;
 const int FORWARD = LOW;
 const int REVERSE = HIGH;
 const int MICROSTEPS = 16;
@@ -15,6 +15,7 @@ void setup() {
   pinMode(stepPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
   pinMode(forwardPin, INPUT);
+  pinMode(reversePin, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 };
 void rotate_for_duration(int direction, int speed, int duration);
@@ -24,6 +25,7 @@ void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
 
   if (digitalRead(forwardPin)) rotate_for_duration(FORWARD, 30, 5);
+  if (digitalRead(reversePin)) rotate_for_duration(REVERSE, 120, 10);
 }
 
 void rotate_for_duration(int direction, int speed, int duration) {
@@ -38,8 +40,8 @@ void rotate_for_duration(int direction, int speed, int duration) {
   while (millis() - startTime < duration * 1000) {
     if (!(digitalRead(stopPin))) return;
     step(direction);
-    // 200 * 16 steps per revolution
-    delayMicroseconds(60 * 1000 * 1000 / speed / (200 * 16));
+    // 200 * MICROSTEPS steps per revolution
+    delayMicroseconds(60 * 1000 * 1000 / speed / (200 * MICROSTEPS));
   }
 }
 
